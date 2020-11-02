@@ -16,21 +16,34 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
-@TODO implement endpoint
+@TODO [OK] implement endpoint
     GET /drinks
         it should be a public endpoint
         it should contain only the drink.short() data representation
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    try:
+        drinks = Drink.query.all()
+        drinks_list = [drink.short() for drink in drinks]
+
+        return jsonify({
+            'success': True,
+            'drinks': drinks_list
+        }, 200)
+
+    except:
+        abort(422)
 
 
 '''
-@TODO implement endpoint
+@TODO [OK] implement endpoint
     GET /drinks-detail
         it should require the 'get:drinks-detail' permission
         it should contain the drink.long() data representation
@@ -38,9 +51,25 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks-detail', methods=['GET'])
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(jwt):
+
+    try:
+        drinks = Drink.query.all()
+        drinks_detailed_list = [drink.long() for drink in drinks]
+
+        return jsonify({
+            'success': True,
+            'drinks': drinks_detailed_list
+        }, 200)
+
+    except:
+        abort(422)
+
 
 '''
-@TODO implement endpoint
+@TODO [OK] implement endpoint
     POST /drinks
         it should create a new row in the drinks table
         it should require the 'post:drinks' permission
@@ -49,6 +78,27 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def post_drink(jwt):
+    try:
+        body = request.get_json()
+        new_title = body.get('title', None)
+        new_recipe = body.get('recipe', None)
+
+        if (new_title is None) or (new_recipe is None):
+            abort(422)
+
+        drink = Drink(title=new_title, recipe=new_recipe)
+        drink.insert()
+
+        return jsonify({
+            'success': True,
+            'drinks': Drink.long(drink)
+        }, 200)
+
+    except:
+        abort(500)
 
 '''
 @TODO implement endpoint
