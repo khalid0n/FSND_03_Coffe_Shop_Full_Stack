@@ -112,6 +112,24 @@ def post_drink(jwt):
         or appropriate status code indicating reason for failure
 '''
 
+# @app.route('/drinks/<int:id>', methods=['PATCH'])
+# @requires_auth('patch:drinks')
+# def update_drink(jwt, id):
+#     try:
+#         body = request.get_json()
+#         drink = Drink.query.filter_by(id=id).one_or_none()
+#
+#         if drink is None:
+#             abort(404)
+#
+#
+#
+#
+#
+#     except:
+#         abort(500)
+
+
 
 '''
 @TODO implement endpoint
