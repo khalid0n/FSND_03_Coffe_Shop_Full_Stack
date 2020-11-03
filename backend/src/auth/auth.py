@@ -92,7 +92,7 @@ def check_permissions(permission, payload):
         raise AuthError({
             'code': 'invalid_claims',
             'description': 'Permissions not found'
-        }, 400)
+        }, 401)
 
     return True
 
@@ -192,7 +192,6 @@ def requires_auth(permission=''):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
-            print(payload)
             return f(payload, *args, **kwargs)
 
         return wrapper
